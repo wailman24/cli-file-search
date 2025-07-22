@@ -21,17 +21,30 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		dirPath := "C:\\Dev\\ts"
-		files := service.ListFiles(dirPath)
-		for _,file:=range files{
-			fmt.Printf("file: %s \n",file)
+		dirPath := "C:\\Users\\Asus\\OneDrive\\Desktop\\wscan"
+		chtext := make(chan string)
+		chfiles := make(chan []string)
+
+		go service.ListFiles(dirPath, chfiles)
+		go service.ReadFiles(chfiles, chtext)
+		for text := range chtext {
+			fmt.Printf("line: %s\n", text)
 		}
-		
+
+		jokeTerm, _ := cmd.Flags().GetString("regex")
+
+		if jokeTerm != "" {
+			fmt.Printf("hello man %s", jokeTerm)
+		} else {
+			fmt.Printf("hello man 2 %s", jokeTerm)
+		}
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(getCmd)
+
+	getCmd.PersistentFlags().String("regex", "r", "A search term for a dad joke.")
 
 	// Here you will define your flags and configuration settings.
 
