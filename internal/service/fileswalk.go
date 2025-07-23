@@ -8,6 +8,11 @@ import (
 	"path/filepath"
 )
 
+type InfoFile struct {
+	Line string
+	File string
+}
+
 func ListFiles(dir string, chfiles chan<- []string) []string {
 	var files []string
 
@@ -25,7 +30,7 @@ func ListFiles(dir string, chfiles chan<- []string) []string {
 	return files
 }
 
-func ReadFiles(chfiles <-chan []string, chtext chan<- string) {
+func (info *InfoFile) ReadFiles(chfiles <-chan []string, chtext chan<- InfoFile) {
 	files := <-chfiles
 	for _, file := range files {
 		f, err := os.Open(file)
@@ -37,7 +42,9 @@ func ReadFiles(chfiles <-chan []string, chtext chan<- string) {
 		scanner := bufio.NewScanner(f)
 		for scanner.Scan() {
 			//fmt.Println(scanner.Text())
-			chtext <- scanner.Text()
+			info.Line = scanner.Text()
+			info.File = file
+			chtext <- *info
 		}
 
 		if err := scanner.Err(); err != nil {

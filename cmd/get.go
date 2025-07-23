@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"fmt"
+	"regexp"
 
 	"github.com/spf13/cobra"
 	"github.com/wailman24/cli-file-search.git/internal/service"
@@ -21,30 +22,44 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		infof := service.InfoFile{}
 		dirPath := "C:\\Users\\Asus\\OneDrive\\Desktop\\wscan"
-		chtext := make(chan string)
+		chtext := make(chan service.InfoFile)
 		chfiles := make(chan []string)
+		rgx, _ := cmd.Flags().GetString("regex")
 
 		go service.ListFiles(dirPath, chfiles)
-		go service.ReadFiles(chfiles, chtext)
+		go infof.ReadFiles(chfiles, chtext)
+		//infof.ReadFiles
 		for text := range chtext {
-			fmt.Printf("line: %s\n", text)
+			//fmt.Printf("line: %s\n", text)
+			r, _ := regexp.Compile(rgx)
+			if rgx != "" {
+				fmt.Printf("file: %s ", text.File)
+				fmt.Println(r.FindAllString(text.Line, -1))
+
+				//fmt.Printf("hello man %s", text)
+			} else {
+				fmt.Printf("the flag value is empty")
+			}
 		}
 
-		jokeTerm, _ := cmd.Flags().GetString("regex")
-
-		if jokeTerm != "" {
-			fmt.Printf("hello man %s", jokeTerm)
+		/* 	line, _ := cmd.Flags().GetString("regex")
+		r, _ := regexp.Compile("w([a-z]+)ch")
+		if line != "" {
+			fmt.Println(r.FindAllString(line, -1))
+			fmt.Printf("hello man %s", line)
 		} else {
-			fmt.Printf("hello man 2 %s", jokeTerm)
-		}
+			fmt.Printf("the flag value is empty")
+		} */
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(getCmd)
 
-	getCmd.PersistentFlags().String("regex", "r", "A search term for a dad joke.")
+	//getCmd.PersistentFlags().String("dir", "d", "A search term for a dad joke.")
+	getCmd.PersistentFlags().String("regex", "r", "enter the regex you are looking for")
 
 	// Here you will define your flags and configuration settings.
 
