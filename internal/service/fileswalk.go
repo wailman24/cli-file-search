@@ -11,15 +11,31 @@ import (
 type InfoFile struct {
 	Line string
 	File string
+	NumL int
 }
 
-func ListFiles(dir string, chfiles chan<- []string) []string {
+func ListFiles(dir string, chfiles chan<- []string, ext string, ignore string) []string {
 	var files []string
+	if dir == "" {
+		return nil
+	}
 
 	err := filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
-		if !d.IsDir() /* && filepath.Ext(path) == ".md" */ {
+
+		/* var fignore, dignore string
+
+		if ignore != "" && ignore[0] == '.' {
+			fignore = ignore
+		} else {
+			dignore = ignore
+		} */
+
+		if !d.IsDir() && (filepath.Ext(path) == ext || ext == "") && (filepath.Ext(path) != ignore || ignore == "") {
 			files = append(files, path)
+		} else if d.IsDir() && (d.Name() == ignore) {
+			return filepath.SkipDir
 		}
+
 		return nil
 	})
 	if err != nil {
@@ -40,11 +56,16 @@ func (info *InfoFile) ReadFiles(chfiles <-chan []string, chtext chan<- InfoFile)
 		defer f.Close()
 
 		scanner := bufio.NewScanner(f)
+		i := 0
 		for scanner.Scan() {
+			i++
 			//fmt.Println(scanner.Text())
-			info.Line = scanner.Text()
-			info.File = file
-			chtext <- *info
+			if scanner.Text() != "" {
+				info.NumL = i
+				info.Line = scanner.Text()
+				info.File = file
+				chtext <- *info
+			}
 		}
 
 		if err := scanner.Err(); err != nil {

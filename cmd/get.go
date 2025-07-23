@@ -23,44 +23,50 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		infof := service.InfoFile{}
-		dirPath := "C:\\Users\\Asus\\OneDrive\\Desktop\\wscan"
+		//dirPath := "C:\\Users\\Asus\\OneDrive\\Desktop\\wscan"
 		chtext := make(chan service.InfoFile)
 		chfiles := make(chan []string)
 		rgx, _ := cmd.Flags().GetString("regex")
+		dir, err := cmd.Flags().GetString("dir")
+		ext, _ := cmd.Flags().GetString("ext")
+		ignore, _ := cmd.Flags().GetString("ignore")
+		if err != nil {
+			fmt.Printf("please provide directory to scan")
+		}
 
-		go service.ListFiles(dirPath, chfiles)
+		if !cmd.Flags().Lookup("ext").Changed {
+			ext = ""
+		}
+		/* if !cmd.Flags().Lookup("ignore").Changed {
+			ignore = ""
+		} */
+
+		go service.ListFiles(dir, chfiles, ext, ignore)
 		go infof.ReadFiles(chfiles, chtext)
 		//infof.ReadFiles
 		for text := range chtext {
 			//fmt.Printf("line: %s\n", text)
 			r, _ := regexp.Compile(rgx)
 			if rgx != "" {
-				fmt.Printf("file: %s ", text.File)
-				fmt.Println(r.FindAllString(text.Line, -1))
-
-				//fmt.Printf("hello man %s", text)
+				if r.FindAllString(text.Line, -1) != nil {
+					fmt.Printf("file: %s  Line: %d ", text.File, text.NumL)
+					fmt.Println(r.FindAllString(text.Line, -1))
+				}
+				//fmt.Printf("hello %s", text)
 			} else {
 				fmt.Printf("the flag value is empty")
 			}
 		}
-
-		/* 	line, _ := cmd.Flags().GetString("regex")
-		r, _ := regexp.Compile("w([a-z]+)ch")
-		if line != "" {
-			fmt.Println(r.FindAllString(line, -1))
-			fmt.Printf("hello man %s", line)
-		} else {
-			fmt.Printf("the flag value is empty")
-		} */
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(getCmd)
 
-	//getCmd.PersistentFlags().String("dir", "d", "A search term for a dad joke.")
+	getCmd.PersistentFlags().String("dir", "d", "enter the dir you to search in")
 	getCmd.PersistentFlags().String("regex", "r", "enter the regex you are looking for")
-
+	getCmd.PersistentFlags().String("ext", "e", "enter the extention you to scan")
+	getCmd.PersistentFlags().String("ignore", "i", "enter the extention or dir you want to ignore")
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
