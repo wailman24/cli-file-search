@@ -62,9 +62,25 @@ Each match result is printed as a separate JSON object.
 
 ---
 
+## 🛠️ Build Instructions
+
+To build the CLI tool from source:
+
+```bash
+git clone https://github.com/wailman24/cli-file-search.git
+cd cli-file-search
+go build -o wscan main.go
+```
+
+This will generate an executable named `wscan` in the current directory. You can run it directly:
+
+```bash
+./wscan --dir="..." --regex="..."
+```
+
+---
 
 ## 👤 Author
 
 **Wail Mansour**  
 🔗 GitHub: [wailman24](https://github.com/wailman24)
-
