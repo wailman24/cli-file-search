@@ -2,6 +2,8 @@ package service
 
 import (
 	"bufio"
+	"fmt"
+	"io"
 	"io/fs"
 	"log"
 	"os"
@@ -16,21 +18,15 @@ type InfoFile struct {
 
 func ListFiles(dir string, chfiles chan<- []string, ext string, ignore string) []string {
 	var files []string
+	var isbinary bool
 	if dir == "" {
 		return nil
 	}
 
 	err := filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
+		isbinary, _ = IsBinaryFile(path)
 
-		/* var fignore, dignore string
-
-		if ignore != "" && ignore[0] == '.' {
-			fignore = ignore
-		} else {
-			dignore = ignore
-		} */
-
-		if !d.IsDir() && (filepath.Ext(path) == ext || ext == "") && (filepath.Ext(path) != ignore || ignore == "") {
+		if !isbinary && !d.IsDir() && (filepath.Ext(path) == ext || ext == "") && (filepath.Ext(path) != ignore || ignore == "") {
 			files = append(files, path)
 		} else if d.IsDir() && (d.Name() == ignore) {
 			return filepath.SkipDir
@@ -76,4 +72,32 @@ func (info *InfoFile) ReadFiles(chfiles <-chan []string, chtext chan<- InfoFile)
 
 	defer close(chtext)
 
+}
+
+func IsBinaryFile(filePath string) (bool, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return false, fmt.Errorf("failed to open file: %w", err)
+	}
+	defer file.Close()
+
+	buffer := make([]byte, 1024)
+	n, err := file.Read(buffer)
+	if err != nil && err != io.EOF {
+		return false, fmt.Errorf("failed to read file: %w", err)
+	}
+
+	binaryCount := 0
+	for _, b := range buffer[:n] {
+		// ASCII printable range: 9, 10, 13 (tab, newline, carriage return), and 32–126
+		if (b > 0 && b < 8) || (b > 13 && b < 32) || b == 0x00 {
+			binaryCount++
+		}
+	}
+
+	if n > 0 && float64(binaryCount)/float64(n) > 0.1 {
+		return true, nil
+	}
+
+	return false, nil
 }
