@@ -1,4 +1,4 @@
-module github.com/wailman24/cli-file-search.git
+module github.com/wailman24/cli-file-search
 
 go 1.24.4
 
