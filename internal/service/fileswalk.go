@@ -49,11 +49,11 @@ func ListFiles(dir string, chfiles chan<- []string, ext string, ignore string) [
 func (info *InfoFile) ReadFiles(chfiles <-chan []string, chtext chan<- InfoFile) {
 	files := <-chfiles
 	for _, file := range files {
+
 		f, err := os.Open(file)
 		if err != nil {
 			log.Fatal(err)
 		}
-		defer f.Close()
 
 		scanner := bufio.NewScanner(f)
 		i := 0
@@ -71,8 +71,9 @@ func (info *InfoFile) ReadFiles(chfiles <-chan []string, chtext chan<- InfoFile)
 		if err := scanner.Err(); err != nil {
 			log.Fatal(err)
 		}
-
+		f.Close()
 	}
+
 	defer close(chtext)
 
 }
