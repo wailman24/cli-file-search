@@ -10,7 +10,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
-	"github.com/wailman24/cli-file-search.git/internal/service"
+	"github.com/wailman24/cli-file-search/internal/service"
 )
 
 type data struct {
