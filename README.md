@@ -82,5 +82,5 @@ This will generate an executable named `wscan` in the current directory. You can
 
 ## 👤 Author
 
-**Wail Mansour**  
+**Wail Mansour Ouahchia**  
 🔗 GitHub: [wailman24](https://github.com/wailman24)
