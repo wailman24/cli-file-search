@@ -75,7 +75,7 @@ go build -o wscan.exe main.go
 This will generate an executable named `wscan` in the current directory. You can run it directly:
 
 ```bash
-./wscan get --dir="..." --regex="..."
+.\wscan get --dir="..." --regex="..."
 ```
 
 ---
