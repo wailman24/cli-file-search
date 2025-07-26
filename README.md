@@ -18,7 +18,7 @@
 ## 📦 Usage
 
 ```bash
-wscan --dir="<path>" --regex="<pattern>" --ext="<.ext>" --ignore="<.ext|folder>"
+wscan get --dir="<path>" --regex="<pattern>" --ext="<.ext>" --ignore="<.ext|folder>"
 ```
 
 ### 🧩 Flags
@@ -37,13 +37,13 @@ wscan --dir="<path>" --regex="<pattern>" --ext="<.ext>" --ignore="<.ext|folder>"
 Search for `wail` inside `.txt` files:
 
 ```bash
-wscan --dir="C:\\Users\\Asus\\OneDrive\\Desktop\\wscan" --regex="wail" --ext=".txt"
+wscan get --dir="C:\\Users\\Asus\\OneDrive\\Desktop\\wscan" --regex="wail" --ext=".txt"
 ```
 
 Ignore `.log` files and the `vendor` directory:
 
 ```bash
-wscan --dir="C:\\Users\\Asus\\OneDrive\\Desktop\\wscan" --regex="error" --ignore=".log"
+wscan get --dir="C:\\Users\\Asus\\OneDrive\\Desktop\\wscan" --regex="error" --ignore=".log"
 ```
 
 ---
@@ -75,7 +75,7 @@ go build -o wscan main.go
 This will generate an executable named `wscan` in the current directory. You can run it directly:
 
 ```bash
-./wscan --dir="..." --regex="..."
+./wscan get --dir="..." --regex="..."
 ```
 
 ---
