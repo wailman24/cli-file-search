@@ -69,7 +69,7 @@ To build the CLI tool from source:
 ```bash
 git clone https://github.com/wailman24/cli-file-search.git
 cd cli-file-search
-go build -o wscan main.go
+go build -o wscan.exe main.go
 ```
 
 This will generate an executable named `wscan` in the current directory. You can run it directly:
